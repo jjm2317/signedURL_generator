@@ -33,16 +33,28 @@ const rsaSha1Sign = (policy, privateKeyFileName) => {
 
     //Buffer : 바이너리 데이터들의 스트림을 읽거나, 조작하는 메커니즘
     //데이터가 버퍼에 있는동안 스트리밍 되는 데이터를 조작할 수 있다. 
-    const buffer = new Buffer(5);
 
-    const fd = fs.readFileSync(privateKeyFileName, buffer, 0, 5, null, (err, bytesRead, buffer) => {
-        console.log(buffer.toString('utf-8', 0, buffer.length))
-    });
-    console.log(fd);
+    try {
+        const privateKey = fs.readFileSync(privateKeyFileName, 'utf8');
+        if (privateKey.length > 8192) throw 'Wrong file!';
+
+        const sign = crypto.createSign('RSA-SHA1');
+        sign.update(policy);
+        signature = sign.sign(privateKey, 'base64');
+
+        return signature;
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+
+    // fs.close(fd);
+    // console.log(fs)
 
 
 };
-rsaSha1Sign(policy, privateKeyFileName);
+console.log(rsaSha1Sign(policy, privateKeyFileName));
 const urlSafeBase64Encode = () => { };
 
 const urlSafeBase64Encode1 = () => {
