@@ -35,7 +35,6 @@ const rsaSha1Sign = (policy, privateKeyFileName) => {
         const sign = crypto.createSign('RSA-SHA1');
         sign.update(policy);
         signature = sign.sign(privateKey, 'base64');
-
         return signature;
     }
     catch (err) {
@@ -43,11 +42,16 @@ const rsaSha1Sign = (policy, privateKeyFileName) => {
     }
 };
 
-const urlSafeBase64Encode = () => { };
-
-const urlSafeBase64Encode1 = () => {
-
+//signature와 policy는 base64 encode 이후 +, =, / 을 각각 -, _, ~ 로 대체
+const urlSafeBase64Encode = (value) => {
+    value.replace('+', '-');
+    value.replace('=', '_');
+    value.replace('/', '~');
+    return value;
 };
+
+// const urlSafeBase64Encode1 = () => {
+// };
 
 const createStreamName = () => {
 
