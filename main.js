@@ -25,14 +25,8 @@ const policy = JSON.stringify({
     ]
 });
 
-
-
-
 const rsaSha1Sign = (policy, privateKeyFileName) => {
     let signature = '';
-
-    //Buffer : 바이너리 데이터들의 스트림을 읽거나, 조작하는 메커니즘
-    //데이터가 버퍼에 있는동안 스트리밍 되는 데이터를 조작할 수 있다. 
 
     try {
         const privateKey = fs.readFileSync(privateKeyFileName, 'utf8');
@@ -47,14 +41,8 @@ const rsaSha1Sign = (policy, privateKeyFileName) => {
     catch (err) {
         console.log(err);
     }
-
-
-    // fs.close(fd);
-    // console.log(fs)
-
-
 };
-console.log(rsaSha1Sign(policy, privateKeyFileName));
+
 const urlSafeBase64Encode = () => { };
 
 const urlSafeBase64Encode1 = () => {
