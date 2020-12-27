@@ -1,4 +1,5 @@
 //crypto 모듈 : 암호화 목적
+const { POINT_CONVERSION_COMPRESSED } = require('constants');
 const crypto = require('crypto');
 //파일 시스템 
 const fs = require('fs');
@@ -10,6 +11,7 @@ const keyPairId = '';
 const urlPath = '';
 const expires = Date.now() + 21600;
 const clientIp = '';
+const waterMark = "1010101101"
 //signed url policy : 3가지 => 경로확인, url 만료 기간, 요청 ip 주소 확인 
 const policy = JSON.stringify({
     Statement: [
@@ -19,7 +21,10 @@ const policy = JSON.stringify({
                 DateLessThan: {
                     "AWS:EpochTime": `${expires}`
                 },
-                IpAddress: { "AWS:SourceIp": `${clientIp}` }
+                IpAddress: { "AWS:SourceIp": `${clientIp}` },
+                WaterMark: {
+                    Binary: `${waterMark}`
+                }
             }
         }
     ]
@@ -41,20 +46,23 @@ const rsaSha1Sign = (policy, privateKeyFileName) => {
         console.log(err);
     }
 };
-
 //signature와 policy는 base64 encode 이후 +, =, / 을 각각 -, _, ~ 로 대체
 const urlSafeBase64Encode = (value) => {
-    value.replace('+', '-');
-    value.replace('=', '_');
-    value.replace('/', '~');
-    return value;
+    return value.replace(/[+=\/]/ig, match => match === '+' ? '-' : (match === '=' ? '_' : '~'));
 };
+console.log(urlSafeBase64Encode(rsaSha1Sign(policy, privateKeyFileName)));
 
-// const urlSafeBase64Encode1 = () => {
-// };
 
-const createStreamName = () => {
-
+const createStreamName = (urlPath, policy, signature, keyPairId, expires) => {
+    let path = "";
+    let result = urlPath;
+    const separator = urlPath.match(/?/) ? '&' : '?';
+    if (expires) {
+        result += `${path + separator}Expires=${expires}&Signature=${signature}&Key-Pair-Id=${keyPairId}`;
+    } else {
+        result += `${path + separator}Policy=${Policy}&Signature=${signature}&Key-Pair-Id=${keyPairId}`;
+    }
+    return result.replace(/\n/ig, '');
 };
 
 const encodeQueryParams = () => { };
